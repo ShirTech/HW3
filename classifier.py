@@ -1,7 +1,9 @@
+import csv
 import math
 import pickle
 import random
 from pathlib import Path
+import heapq
 
 from hw3_utils import abstract_classifier, load_data, abstract_classifier_factory
 from collections import Counter
@@ -45,19 +47,14 @@ class knn_classifier(abstract_classifier):
 
         #  TODO 2. find k nearest examples
         results = []
-        labels = self.labels[0]
-        # s= sorted(zip((distances, labels)))
-        # distances, classifications = map(list, zip(*s))
-
-        # list1, list2 = (list(x) for x in zip(*sorted(zip(list1, list2))))
+        labels=self.labels[0]
         distances, classifications = (list(t) for t in zip(*sorted(zip(distances, labels))))
-        k = min(self.k, len(self.labels))
+        k = min(self.k, len(labels))
         for i in range(k):
             results.append(classifications[i])
 
         #  TODO 3. choose majority from those examples
-        return majority(results[0])
-
+        return majority(results)
 
 class knn_factory(abstract_classifier_factory):
     def __init__(self, k):
@@ -152,14 +149,15 @@ def evaluate(classifier_factory, k):
 
 
 def groups_union(index, k):
-    features = []
-    labels = []
+    features =[]
+    labels= []
     for i in range(1, k + 1):
         if i != index:
             train_group_features, train_group_labels = load_k_fold_data(i)
             features.append(train_group_features)
             labels.append(train_group_labels)
     return features, labels
+
 
 
 def getFeatures(train_group):
@@ -172,8 +170,3 @@ def getLabels(train_group):
 
 x = (train_features, train_labels)
 split_crosscheck_groups(x, 2)
-
-results = []
-knn_k = knn_factory(1)
-avg_accuracy, avg_error = evaluate(knn_k, 2)
-results.append([1, avg_accuracy, avg_error])
