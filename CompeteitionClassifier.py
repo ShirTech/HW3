@@ -1,4 +1,4 @@
-from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
@@ -78,8 +78,13 @@ train_features, train_labels, test_features = load_data()
 # print('Accuracy of LDA classifier on test set: {:.2f}'.format(
 #     clf.score(test_group_features, test_group_labels)))
 #
-#
-#
+# RandomForestClassifier
+## # TODO: Linear Discriminant
+# clf = RandomForestClassifier().fit(data, getLabels(train_group))
+# print(
+#     'Accuracy of LDA classifier on training set: {:.2f}'.format(clf.score(data, getLabels(train_group))))
+# print('Accuracy of LDA classifier on test set: {:.2f}'.format(
+#     clf.score(test_group_features, test_group_labels)))
 
 #
 #
@@ -113,20 +118,22 @@ train_features, train_labels, test_features = load_data()
 #
 
 
-names = ["ID3", "3-Nearest Neighbors", "Neural Net", "AdaBoost"]
+names = ["ID3", "3-Nearest Neighbors", "Neural Net", "AdaBoost", "RandomForest"]
 
 factor = {
     "ID3": 1,
-    "3-Nearest Neighbors": 3,
+    "3-Nearest Neighbors": 4,
     "Neural Net": 4,
     "AdaBoost": 3,
+    "RandomForest": 3,
 }
 
 classifiers = [
     DecisionTreeClassifier(criterion="entropy"),
-    KNeighborsClassifier(5),
+    KNeighborsClassifier(3),
     MLPClassifier(alpha=1),
-    AdaBoostClassifier()]
+    AdaBoostClassifier(),
+    RandomForestClassifier()]
 
 X_train = data
 y_train = getLabels(train_group)
@@ -145,10 +152,10 @@ for name, clf in zip(names, classifiers):
     test_predict = clf.predict(X_test)
     for i in range(len(train_predict)):
         if train_predict[i] == True:
-            combine_train[i] += 1*clf_factor
+            combine_train[i] += 1 * clf_factor
     for i in range(len(test_predict)):
         if test_predict[i] == True:
-            combine_test[i] += 1*clf_factor
+            combine_test[i] += 1 * clf_factor
     # print(test_predict)
     score_train = clf.score(X_train, y_train)
     score_test = clf.score(X_test, y_test)
@@ -158,12 +165,12 @@ for name, clf in zip(names, classifiers):
 train_predict = []
 test_predict = []
 for i in range(len(combine_train)):
-    if combine_train[i] >= 6:
+    if combine_train[i] >= 8:
         train_predict.append(True)
     else:
         train_predict.append(False)
 
-    if combine_test[i] >= 6:
+    if combine_test[i] >= 8:
         test_predict.append(True)
     else:
         test_predict.append(False)
