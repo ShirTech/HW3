@@ -47,7 +47,7 @@ class knn_classifier(abstract_classifier):
 
         #  TODO 2. find k nearest examples
         results = []
-        labels=self.labels[0]
+        labels = self.labels[0]
         distances, classifications = (list(t) for t in zip(*sorted(zip(distances, labels))))
         k = min(self.k, len(labels))
         for i in range(k):
@@ -55,6 +55,7 @@ class knn_classifier(abstract_classifier):
 
         #  TODO 3. choose majority from those examples
         return majority(results)
+
 
 class knn_factory(abstract_classifier_factory):
     def __init__(self, k):
@@ -105,6 +106,9 @@ def split_crosscheck_groups(dataset, num_folds):
             temp_features.append(tmp[0])
             temp_labels.append(tmp[1])
 
+        # if i == num_folds:
+        #     if shuffled_sick
+
         with open(path, 'wb') as f:
             tuple_to_store = (temp_features, temp_labels)
             pickle.dump(tuple_to_store, f, protocol=pickle.HIGHEST_PROTOCOL)
@@ -149,15 +153,14 @@ def evaluate(classifier_factory, k):
 
 
 def groups_union(index, k):
-    features =[]
-    labels= []
+    features = []
+    labels = []
     for i in range(1, k + 1):
         if i != index:
             train_group_features, train_group_labels = load_k_fold_data(i)
             features.append(train_group_features)
             labels.append(train_group_labels)
     return features, labels
-
 
 
 def getFeatures(train_group):

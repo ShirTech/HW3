@@ -1,5 +1,6 @@
 from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -139,47 +140,49 @@ X_train = data
 y_train = getLabels(train_group)
 X_test = test_group_features
 y_test = test_group_labels
+
+
 # iterate over classifiers
-combine_train = {}
-combine_test = {}
-for i in range(len(X_test)):
-    combine_train[i] = 0
-    combine_test[i] = 0
-for name, clf in zip(names, classifiers):
-    clf_factor = factor[name]
-    clf.fit(X_train, y_train)
-    train_predict = clf.predict(X_train)
-    test_predict = clf.predict(X_test)
-    for i in range(len(train_predict)):
-        if train_predict[i] == True:
-            combine_train[i] += 1 * clf_factor
-    for i in range(len(test_predict)):
-        if test_predict[i] == True:
-            combine_test[i] += 1 * clf_factor
-    # print(test_predict)
-    score_train = clf.score(X_train, y_train)
-    score_test = clf.score(X_test, y_test)
-    print('Accuracy of ' + name + ' on training set: ' + str(score_train))
-    print('Accuracy of ' + name + ' on test set: ' + str(score_test))
-
-train_predict = []
-test_predict = []
-for i in range(len(combine_train)):
-    if combine_train[i] >= 8:
-        train_predict.append(True)
-    else:
-        train_predict.append(False)
-
-    if combine_test[i] >= 8:
-        test_predict.append(True)
-    else:
-        test_predict.append(False)
-
-score_train = accuracy_score(train_predict, y_train)
-score_test = accuracy_score(test_predict, y_test)
-
-print('Accuracy of Combined on training set: ' + str(score_train))
-print('Accuracy of Combined on test set: ' + str(score_test))
+# combine_train = {}
+# combine_test = {}
+# for i in range(len(X_test)):
+#     combine_train[i] = 0
+#     combine_test[i] = 0
+# for name, clf in zip(names, classifiers):
+#     clf_factor = factor[name]
+#     clf.fit(X_train, y_train)
+#     train_predict = clf.predict(X_train)
+#     test_predict = clf.predict(X_test)
+#     for i in range(len(train_predict)):
+#         if train_predict[i] == True:
+#             combine_train[i] += 1 * clf_factor
+#     for i in range(len(test_predict)):
+#         if test_predict[i] == True:
+#             combine_test[i] += 1 * clf_factor
+#     # print(test_predict)
+#     score_train = clf.score(X_train, y_train)
+#     score_test = clf.score(X_test, y_test)
+#     print('Accuracy of ' + name + ' on training set: ' + str(score_train))
+#     print('Accuracy of ' + name + ' on test set: ' + str(score_test))
+#
+# train_predict = []
+# test_predict = []
+# for i in range(len(combine_train)):
+#     if combine_train[i] >= 8:
+#         train_predict.append(True)
+#     else:
+#         train_predict.append(False)
+#
+#     if combine_test[i] >= 8:
+#         test_predict.append(True)
+#     else:
+#         test_predict.append(False)
+#
+# score_train = accuracy_score(train_predict, y_train)
+# score_test = accuracy_score(test_predict, y_test)
+#
+# print('Accuracy of Combined on training set: ' + str(score_train))
+# print('Accuracy of Combined on test set: ' + str(score_test))
 
 #
 #
@@ -204,3 +207,39 @@ print('Accuracy of Combined on test set: ' + str(score_test))
 #     for key in hashmap:
 #         if hashmap[key] > 1:
 #             print(key)
+
+
+def convertFeaturesToResFet(features):
+    clf_results = []
+    for name, clf in zip(names, classifiers):
+        clf_factor = factor[name]
+        clf.fit(X_train, y_train)
+        train_predict = clf.predict(features)
+
+        if len(clf_results) == 0:
+            # first classifier create nodes
+            for prediction in train_predict:
+                clf_results.append([prediction])
+        else:
+            # non-first classifier append to nodes
+            for prediction, l in zip(train_predict, clf_results):
+                l.append(prediction)
+    return clf_results
+
+
+def newClassifier():
+    clf_results_train = convertFeaturesToResFet(X_train)
+    clf_results_test = convertFeaturesToResFet(X_test)
+
+    # at this point clf_factor contains 499 samples of features: each feature is the result of a certain classifier and now we'll train a new classifer using this features
+    final_clf = classifiers[3]
+    final_clf.fit(clf_results_train, y_train)
+    final_clf.fit(clf_results_test, y_test)
+
+    score_train = final_clf.score(clf_results_train, y_train)
+    score_test = final_clf.score(clf_results_test, y_test)
+    print('Accuracy of ' + "MAXX" + ' on training set: ' + str(score_train))
+    print('Accuracy of ' + "MAXX" + ' on test set: ' + str(score_test))
+
+
+newClassifier()
