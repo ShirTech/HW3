@@ -83,34 +83,48 @@ def split_crosscheck_groups(dataset, num_folds):
         else:
             healthy_list.append((features, label))
 
-    fold_size = len(labels) / num_folds
+    fold_size = math.floor(len(labels) / num_folds)
     healthy_len = len(healthy_list)
     sick_len = len(sick_list)
-    healthy_in_fold = math.floor((healthy_len / (healthy_len + sick_len)) * fold_size)
-    sick_in_fold = math.floor((sick_len / (healthy_len + sick_len)) * fold_size)
+    healthy_in_fold = round((healthy_len / (healthy_len + sick_len)) * fold_size)
+    # sick_in_fold = math.floor((sick_len / (healthy_len + sick_len)) * fold_size)
     shuffled_healthy = sorted(healthy_list, key=lambda L: random.random())
     shuffled_sick = sorted(sick_list, key=lambda L: random.random())
+
+    files_to_save = []
 
     for i in range(1, num_folds + 1):
         temp_features = []
         temp_labels = []
-        # file configurations:
-        path = "ecg_fold_" + str(i) + ".data"
+        counter = 0
+
         for j in range(healthy_in_fold):
-            tmp = shuffled_healthy.pop()
-            temp_features.append(tmp[0])
-            temp_labels.append(tmp[1])
+            if len(shuffled_healthy) > 0:
+                tmp = shuffled_healthy.pop()
+                temp_features.append(tmp[0])
+                temp_labels.append(tmp[1])
+                counter += 1
 
-        for j in range(sick_in_fold):
-            tmp = shuffled_sick.pop()
-            temp_features.append(tmp[0])
-            temp_labels.append(tmp[1])
+        for j in range(int(fold_size) - counter):
+            if len(shuffled_sick) > 0:
+                tmp = shuffled_sick.pop()
+                temp_features.append(tmp[0])
+                temp_labels.append(tmp[1])
 
-        # if i == num_folds:
-        #     if shuffled_sick
+        tuple_to_store = (temp_features, temp_labels)
+        files_to_save.append(tuple_to_store)
 
+    leftovers = shuffled_sick + shuffled_healthy
+
+    for i in range(len(leftovers)):
+        tmp = leftovers.pop()
+        files_to_save[i][0].append(tmp[0])
+        files_to_save[i][1].append(tmp[1])
+
+    for i in range(len(files_to_save)):
+        path = "ecg_fold_" + str(i+1) + ".data"
         with open(path, 'wb') as f:
-            tuple_to_store = (temp_features, temp_labels)
+            tuple_to_store = files_to_save[i]
             pickle.dump(tuple_to_store, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 
@@ -172,4 +186,4 @@ def getLabels(train_group):
 
 
 x = (train_features, train_labels)
-split_crosscheck_groups(x, 2)
+split_crosscheck_groups(x, 6)
