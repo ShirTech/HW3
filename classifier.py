@@ -1,12 +1,9 @@
-import csv
 import math
 import pickle
 import random
-from pathlib import Path
-import heapq
+from collections import Counter
 
 from hw3_utils import abstract_classifier, load_data, abstract_classifier_factory
-from collections import Counter
 
 train_features, train_labels, test_features = load_data()
 
@@ -47,7 +44,7 @@ class knn_classifier(abstract_classifier):
 
         #  TODO 2. find k nearest examples
         results = []
-        labels = self.labels[0]
+        labels = self.labels
         distances, classifications = (list(t) for t in zip(*sorted(zip(distances, labels))))
         k = min(self.k, len(labels))
         for i in range(k):
@@ -145,7 +142,8 @@ def evaluate(classifier_factory, k):
 
         # TODO: train classifier with train data
         data = getFeatures(train_group)[0]
-        classifier = classifier_factory.train(data, getLabels(train_group))
+        labels = getLabels(train_group)[0]
+        classifier = classifier_factory.train(data, labels)
 
         # TODO: classify each item in test group and collect statistics
         success = 0
@@ -185,5 +183,5 @@ def getLabels(train_group):
     return train_group[1]
 
 
-x = (train_features, train_labels)
-split_crosscheck_groups(x, 6)
+# x = (train_features, train_labels)
+# split_crosscheck_groups(x, 2)

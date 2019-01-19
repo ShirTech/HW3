@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
-
+import numpy as np
 from classifier import load_k_fold_data, getFeatures, getLabels
 from hw3_utils import load_data
 
@@ -119,7 +119,8 @@ train_features, train_labels, test_features = load_data()
 #
 
 
-names = ["ID3", "3-Nearest Neighbors", "Neural Net", "AdaBoost", "RandomForest"]
+# names = ["ID3", "3-Nearest Neighbors", "Neural Net", "AdaBoost", "RandomForest"]
+names = ["ID3", "MinLeaf", "1-Nearest Neighbors", "2-Nearest Neighbors", "3-Nearest Neighbors", "RandomForest"]
 
 factor = {
     "ID3": 1,
@@ -131,9 +132,10 @@ factor = {
 
 classifiers = [
     DecisionTreeClassifier(criterion="entropy"),
+    DecisionTreeClassifier(min_samples_leaf=3),
+    KNeighborsClassifier(1),
+    KNeighborsClassifier(2),
     KNeighborsClassifier(3),
-    MLPClassifier(alpha=1),
-    AdaBoostClassifier(),
     RandomForestClassifier()]
 
 X_train = data
@@ -212,7 +214,7 @@ y_test = test_group_labels
 def convertFeaturesToResFet(features):
     clf_results = []
     for name, clf in zip(names, classifiers):
-        clf_factor = factor[name]
+        # clf_factor = factor[name]
         clf.fit(X_train, y_train)
         train_predict = clf.predict(features)
 
@@ -231,15 +233,39 @@ def newClassifier():
     clf_results_train = convertFeaturesToResFet(X_train)
     clf_results_test = convertFeaturesToResFet(X_test)
 
-    # at this point clf_factor contains 499 samples of features: each feature is the result of a certain classifier and now we'll train a new classifer using this features
-    final_clf = classifiers[3]
-    final_clf.fit(clf_results_train, y_train)
-    final_clf.fit(clf_results_test, y_test)
+    new_train = []
+    for features, extra in zip(X_train, clf_results_train):
+        extra = np.array(extra)
+        new_train.append(np.append(features, extra))
 
-    score_train = final_clf.score(clf_results_train, y_train)
-    score_test = final_clf.score(clf_results_test, y_test)
+    new_test = []
+    for features, extra in zip(X_test, clf_results_test):
+        extra = np.array(extra)
+        new_test.append(np.append(features, extra))
+
+    # clf_results_train = X_train.extend(clf_results_train)
+    # clf_results_test = X_test.extend(clf_results_test)
+
+    # at this point clf_factor contains 499 samples of features: each feature is the result of a certain classifier and now we'll train a new classifer using this features
+    final_clf = classifiers[2]
+    final_clf.fit(new_train, y_train)
+
+    score_train = final_clf.score(new_train, y_train)
+    score_test = final_clf.score(new_test, y_test)
     print('Accuracy of ' + "MAXX" + ' on training set: ' + str(score_train))
     print('Accuracy of ' + "MAXX" + ' on test set: ' + str(score_test))
+    # return score_train, score_test
 
 
 newClassifier()
+# test_avg = 0
+# train_avg = 0
+# for i in range(5):
+#     print(i)
+#     score_train, score_test = newClassifier()
+#     train_avg += score_train
+#     test_avg += score_test
+#     print('current accuracy of ' + "MAXX" + ' on test set: ' + str(score_test))
+#
+# print('Avg accuracy of ' + "MAXX" + ' on training set: ' + str(train_avg/50))
+# print('Avg accuracy of ' + "MAXX" + ' on test set: ' + str(test_avg/50))
