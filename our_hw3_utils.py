@@ -1,6 +1,9 @@
-import numpy as np
-from sklearn.model_selection import cross_val_score
 import copy
+import copy
+import pickle
+
+from sklearn.model_selection import cross_val_score
+from sklearn.neighbors import KNeighborsClassifier
 
 
 def sfs(x, y, required_features_num, clf, score):
@@ -86,6 +89,26 @@ def utilityFunction(clf, x, y):
     # to be used as score function in sfs algorithm
     scores = cross_val_score(clf, x, y, cv=4)
     return scores.mean()
+
+def feature_selection(X, y):
+    neigh = KNeighborsClassifier(n_neighbors=3)
+    neigh.fit(X, y)
+
+    features_chosen = sfs(X, y, 10, neigh, utilityFunction)
+    # create x_train_subset and x_test_subset containing only values of chosen features
+    X_train_subset = [[] for i in range(len(X))]
+    # X_test_subset = [[] for i in range(len(X_test))]
+    for feature_index in features_chosen:
+        # for object_index in range(len(X_test)):
+        #     X_test_subset[object_index].append(X_test[object_index][feature_index])
+        for object_index in range(len(X)):
+            X_train_subset[object_index].append(X[object_index][feature_index])
+
+    path = "updated_features_2.data"
+    with open(path, 'wb') as f:
+        pickle.dump(X_train_subset, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+    return X_train_subset
 
 #
 # features_for_removal = sbs(X_train, y_train, 4, neigh, utilityFunction)
