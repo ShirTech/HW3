@@ -32,9 +32,8 @@ class knn_classifier(abstract_classifier):
     '''
     classify a new set of features
     :param features: the list of feature to classify
-    :return: a tagging of the given features (1 or 0)
+    :return: a tagging of the given features (True or False)
     '''
-
     def classify(self, features):
         # TODO 1. calculate distance from examples using distance_euclidean
         distances = []
@@ -62,9 +61,8 @@ class knn_factory(abstract_classifier_factory):
     train a classifier
     :param data: a list of lists that represents the features that the classifier will be trained with
     :param labels: a list that represents  the labels that the classifier will be trained with
-    :return: abstruct_classifier object
+    :return: knn_classifier object
     '''
-
     def train(self, data, labels) -> knn_classifier:
         return knn_classifier(self.k, data, labels)
 
@@ -84,7 +82,6 @@ def split_crosscheck_groups(dataset, num_folds):
     healthy_len = len(healthy_list)
     sick_len = len(sick_list)
     healthy_in_fold = round((healthy_len / (healthy_len + sick_len)) * fold_size)
-    # sick_in_fold = math.floor((sick_len / (healthy_len + sick_len)) * fold_size)
     shuffled_healthy = sorted(healthy_list, key=lambda L: random.random())
     shuffled_sick = sorted(sick_list, key=lambda L: random.random())
 
@@ -111,8 +108,9 @@ def split_crosscheck_groups(dataset, num_folds):
         tuple_to_store = (temp_features, temp_labels)
         files_to_save.append(tuple_to_store)
 
+    ''' at this point we've divide the samples but have some "leftovers" which we split between different group 
+     for minimum harm and still using all the samples'''
     leftovers = shuffled_sick + shuffled_healthy
-
     for i in range(len(leftovers)):
         tmp = leftovers.pop()
         files_to_save[i][0].append(tmp[0])
@@ -148,8 +146,11 @@ def evaluate(classifier_factory, k):
         # TODO: classify each item in test group and collect statistics
         success = 0
         failure = 0
+        count=0
         for testee_features, testee_real_label in zip(test_group_features, test_group_labels):
             given_label = classifier.classify(testee_features)
+            if given_label==True:
+                count +=1
             if given_label == testee_real_label:
                 success += 1
             else:

@@ -57,7 +57,7 @@ def competition_test(X_train_subset, train_labels, X_test_subset):
             total_score_per_k_train += clf.test(X_train, y_train)
             total_score_per_k_test += clf.test(X_test, y_test)
         print('K value is: ' + str(k))
-        print('Avg accuracy of MAXX on test set: ' + str(total_score_per_k_test / k))
+        print('Avg accuracy of CompetitionClassifier on test set: ' + str(total_score_per_k_test / k))
         total_avg += total_score_per_k_test / k
     print('Total avg for all k is: ' + str(total_avg / 5))
 
