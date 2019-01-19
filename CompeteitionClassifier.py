@@ -1,3 +1,6 @@
+import pickle
+from pathlib import Path
+
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -20,8 +23,7 @@ classifiers = [
     KNeighborsClassifier(2),
     KNeighborsClassifier(2),
     KNeighborsClassifier(3),
-    RandomForestClassifier()]
-
+    RandomForestClassifier(n_estimators=100)]
 
 def convertFeaturesToResultFeatures(X_train, y_train, features):
     clf_results = []
@@ -40,10 +42,9 @@ def convertFeaturesToResultFeatures(X_train, y_train, features):
     return clf_results
 
 
-def test():
-    train_features, train_labels, test_features = load_data()
-    X_train_subset, X_test_subset = feature_selection(train_features, train_labels)
+def competition_test(X_train_subset, train_labels, X_test_subset):
 
+    # TODO: testing our classifier
     total_avg = 0
     for k in [2, 4, 6, 8, 10]:
         test_size = 1 / k
@@ -60,8 +61,10 @@ def test():
         total_avg += total_score_per_k_test / k
     print('Total avg for all k is: ' + str(total_avg / 5))
 
-    pred = clf.classify(X_test_subset)
-    write_prediction(pred)
+    # TODO: classify for contest
+    clf = CompetitionClassifier(X_train_subset, train_labels)
+    prediction = clf.classify(X_test_subset)
+    write_prediction(prediction)
 
 
 class CompetitionClassifier():
@@ -88,7 +91,7 @@ class CompetitionClassifier():
         final_clf = KNeighborsClassifier(1)
         final_clf.fit(new_train, y_train)
 
-        prediction = final_clf.predict(X_test)
+        prediction = final_clf.predict(new_test)
         return prediction
 
     def test(self, X_test, y_test):
@@ -114,4 +117,22 @@ class CompetitionClassifier():
         return score_test
 
 
-test()
+def compete():
+    train_features, train_labels, test_features = load_data()
+
+    # TODO: execute feature selection only once for saving time
+    path = "updated_features.data"
+    my_file = Path(path)
+    if not my_file.is_file():
+        X_train_subset, X_test_subset = feature_selection(train_features, train_labels, test_features)
+        with open(path, 'wb') as f:
+            tuple_to_store = (X_train_subset, X_test_subset)
+            pickle.dump(tuple_to_store, f, protocol=pickle.HIGHEST_PROTOCOL)
+    else:
+        with open(path, 'rb') as f:
+            X_train_subset, X_test_subset = pickle.load(f)
+
+    competition_test(X_train_subset, train_labels, X_test_subset)
+
+
+compete()
