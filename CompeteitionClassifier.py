@@ -1,16 +1,17 @@
-from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.tree import DecisionTreeClassifier
+import copy
+
 import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+
 from classifier import load_k_fold_data, getFeatures, getLabels
 from hw3_utils import load_data
-
 #
-test_group_features, test_group_labels = load_k_fold_data(1)
-train_group = load_k_fold_data(2)
+from our_hw3_utils import sbs, utilityFunction, sfs
+
+test_group_features, test_group_labels = load_k_fold_data(2)
+train_group = load_k_fold_data(1)
 data = getFeatures(train_group)
 labels = getLabels(train_group)
 train_features, train_labels, test_features = load_data()
@@ -50,73 +51,6 @@ train_features, train_labels, test_features = load_data()
 #     'Accuracy of Decision Tree classifier on training set: {:.2f}'.format(clf.score(data, getLabels(train_group))))
 # print('Accuracy of Decision Tree classifier on test set: {:.2f}'.format(
 #     clf.score(test_group_features, test_group_labels)))
-#
-# # TODO: GINI
-# clf = DecisionTreeClassifier(criterion="gini").fit(data, getLabels(train_group))
-# print(
-#     'Accuracy of Decision Tree classifier on training set: {:.2f}'.format(clf.score(data, getLabels(train_group))))
-# print('Accuracy of Decision Tree classifier on test set: {:.2f}'.format(
-#     clf.score(test_group_features, test_group_labels)))
-
-# # TODO: GaussianNB
-# clf = GaussianNB().fit(data, getLabels(train_group))
-# print(
-#     'Accuracy of GaussianNB classifier on training set: {:.2f}'.format(clf.score(data, getLabels(train_group))))
-# print('Accuracy of GaussianNB classifier on test set: {:.2f}'.format(
-#     clf.score(test_group_features, test_group_labels)))
-#
-# # TODO: KNN
-# clf = KNeighborsClassifier(3).fit(data, getLabels(train_group))
-# print(
-#     'Accuracy of KNN classifier on training set: {:.2f}'.format(clf.score(data, getLabels(train_group))))
-# print('Accuracy of KNN classifier on test set: {:.2f}'.format(
-#     clf.score(test_group_features, test_group_labels)))
-
-# # TODO: Linear Discriminant
-# clf = LinearDiscriminantAnalysis().fit(data, getLabels(train_group))
-# print(
-#     'Accuracy of LDA classifier on training set: {:.2f}'.format(clf.score(data, getLabels(train_group))))
-# print('Accuracy of LDA classifier on test set: {:.2f}'.format(
-#     clf.score(test_group_features, test_group_labels)))
-#
-# RandomForestClassifier
-## # TODO: Linear Discriminant
-# clf = RandomForestClassifier().fit(data, getLabels(train_group))
-# print(
-#     'Accuracy of LDA classifier on training set: {:.2f}'.format(clf.score(data, getLabels(train_group))))
-# print('Accuracy of LDA classifier on test set: {:.2f}'.format(
-#     clf.score(test_group_features, test_group_labels)))
-
-#
-#
-# names = ["3-Nearest Neighbors", "Linear SVM", "RBF SVM", "Gaussian Process",
-#          "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
-#          "Naive Bayes", "QDA"]
-#
-# classifiers = [
-#     KNeighborsClassifier(3),
-#     SVC(kernel="linear", C=0.025),
-#     SVC(gamma=2, C=1),
-#     GaussianProcessClassifier(1.0 * RBF(1.0)),
-#     DecisionTreeClassifier(max_depth=5),
-#     RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
-#     MLPClassifier(alpha=1),
-#     AdaBoostClassifier(),
-#     GaussianNB(),
-#     QuadraticDiscriminantAnalysis()]
-#
-# X_train = data
-# y_train = getLabels(train_group)
-# X_test = test_group_features
-# y_test = test_group_labels
-# # iterate over classifiers
-# for name, clf in zip(names, classifiers):
-#     clf.fit(X_train, y_train)
-#     score_train = clf.score(X_train, y_train)
-#     score_test = clf.score(X_test, y_test)
-#     print('Accuracy of '+name+' on training set: '+str(score_train))
-#     print('Accuracy of '+name+' on test set: '+str(score_test))
-#
 
 
 # names = ["ID3", "3-Nearest Neighbors", "Neural Net", "AdaBoost", "RandomForest"]
@@ -211,7 +145,7 @@ y_test = test_group_labels
 #             print(key)
 
 
-def convertFeaturesToResFet(features):
+def convertFeaturesToResFet(X_train ,y_train, features):
     clf_results = []
     for name, clf in zip(names, classifiers):
         # clf_factor = factor[name]
@@ -229,9 +163,9 @@ def convertFeaturesToResFet(features):
     return clf_results
 
 
-def newClassifier():
-    clf_results_train = convertFeaturesToResFet(X_train)
-    clf_results_test = convertFeaturesToResFet(X_test)
+def newClassifier(X_train ,y_train, X_test, y_test):
+    clf_results_train = convertFeaturesToResFet(X_train ,y_train, X_train)
+    clf_results_test = convertFeaturesToResFet(X_train ,y_train, X_test)
 
     new_train = []
     for features, extra in zip(X_train, clf_results_train):
@@ -252,12 +186,12 @@ def newClassifier():
 
     score_train = final_clf.score(new_train, y_train)
     score_test = final_clf.score(new_test, y_test)
-    print('Accuracy of ' + "MAXX" + ' on training set: ' + str(score_train))
-    print('Accuracy of ' + "MAXX" + ' on test set: ' + str(score_test))
-    # return score_train, score_test
+    # print('Accuracy of ' + "MAXX" + ' on training set: ' + str(score_train))
+    # print('Accuracy of ' + "MAXX" + ' on test set: ' + str(score_test))
+    return score_train, score_test
 
 
-newClassifier()
+# newClassifier()
 # test_avg = 0
 # train_avg = 0
 # for i in range(5):
@@ -269,3 +203,39 @@ newClassifier()
 #
 # print('Avg accuracy of ' + "MAXX" + ' on training set: ' + str(train_avg/50))
 # print('Avg accuracy of ' + "MAXX" + ' on test set: ' + str(test_avg/50))
+
+
+
+neigh = KNeighborsClassifier(n_neighbors=1)
+neigh.fit(X_train, y_train)
+score = neigh.score(X_test, y_test)
+# print(score)
+
+features_chosen = sfs(X_train, y_train, 10, neigh, utilityFunction)
+
+# create x_train_subset and x_test_subset containing only values of chosen features
+X_train_subset = [[] for i in range(len(X_train))]
+X_test_subset = [[] for i in range(len(X_test))]
+for feature_index in features_chosen:
+    for object_index in range(len(X_test)):
+        X_test_subset[object_index].append(X_test[object_index][feature_index])
+    for object_index in range(len(X_train)):
+        X_train_subset[object_index].append(X_train[object_index][feature_index])
+
+# x_train_subset and x_test_subset are updated with relevant features only
+
+# newClassifier(X_train_subset, y_train, X_test_subset, y_test)
+
+test_avg = 0
+train_avg = 0
+iterations =50
+for i in range(iterations):
+    print(i)
+    score_train, score_test = newClassifier(X_train_subset, y_train, X_test_subset, y_test)
+    train_avg += score_train
+    test_avg += score_test
+    print('current accuracy of ' + "MAXX" + ' on test set: ' + str(score_test))
+
+print('Avg accuracy of ' + "MAXX" + ' on training set: ' + str(train_avg/iterations))
+print('Avg accuracy of ' + "MAXX" + ' on test set: ' + str(test_avg/iterations))
+

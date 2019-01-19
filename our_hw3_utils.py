@@ -87,3 +87,24 @@ def utilityFunction(clf, x, y):
     # to be used as score function in sfs algorithm
     scores = cross_val_score(clf, x, y, cv=4)
     return scores.mean()
+
+
+
+#
+# features_for_removal = sbs(X_train, y_train, 4, neigh, utilityFunction)
+#
+# # create x_train_subset and x_test_subset containing only values of chosen features
+# x_train_subset = copy.deepcopy(X_train)
+# x_test_subset = copy.deepcopy(X_test)
+# for feature_index in features_for_removal:
+#     for object_index in range(len(X_test)):
+#         x_test_subset[object_index][feature_index] = 0
+#         # x_test_subset[object_index] = np.delete(x_test_subset[object_index], feature_index)
+#     for object_index in range(len(X_train)):
+#         x_train_subset[object_index][feature_index] = 0
+#         # x_train_subset[object_index] = np.delete(x_train_subset[object_index], feature_index)
+#
+#
+# neigh.fit(x_train_subset, y_train)
+# score2 = neigh.score(x_test_subset, y_test)
+# print(score2)
