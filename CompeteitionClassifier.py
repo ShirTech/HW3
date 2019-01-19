@@ -1,4 +1,5 @@
 import copy
+import pickle
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -52,10 +53,6 @@ train_features, train_labels, test_features = load_data()
 # print('Accuracy of Decision Tree classifier on test set: {:.2f}'.format(
 #     clf.score(test_group_features, test_group_labels)))
 
-
-# names = ["ID3", "3-Nearest Neighbors", "Neural Net", "AdaBoost", "RandomForest"]
-names = ["ID3", "MinLeaf", "1-Nearest Neighbors", "2-Nearest Neighbors", "3-Nearest Neighbors", "RandomForest"]
-
 factor = {
     "ID3": 1,
     "3-Nearest Neighbors": 4,
@@ -64,9 +61,19 @@ factor = {
     "RandomForest": 3,
 }
 
+
+# names = ["ID3", "3-Nearest Neighbors", "Neural Net", "AdaBoost", "RandomForest"]
+names = ["ID3", "MinLeaf", "MinLeaf2", "1-Nearest Neighbors", "2-Nearest Neighbors", "3-Nearest Neighbors",
+         "RandomForest"]
+
+
+
+# DecisionTreeClassifier(criterion="entropy", max_depth= 2, min_samples_leaf= 20)
 classifiers = [
     DecisionTreeClassifier(criterion="entropy"),
-    DecisionTreeClassifier(min_samples_leaf=3),
+    DecisionTreeClassifier(min_samples_leaf = 3),
+    KNeighborsClassifier(1),
+    KNeighborsClassifier(1),
     KNeighborsClassifier(1),
     KNeighborsClassifier(2),
     KNeighborsClassifier(3),
@@ -78,74 +85,7 @@ X_test = test_group_features
 y_test = test_group_labels
 
 
-# iterate over classifiers
-# combine_train = {}
-# combine_test = {}
-# for i in range(len(X_test)):
-#     combine_train[i] = 0
-#     combine_test[i] = 0
-# for name, clf in zip(names, classifiers):
-#     clf_factor = factor[name]
-#     clf.fit(X_train, y_train)
-#     train_predict = clf.predict(X_train)
-#     test_predict = clf.predict(X_test)
-#     for i in range(len(train_predict)):
-#         if train_predict[i] == True:
-#             combine_train[i] += 1 * clf_factor
-#     for i in range(len(test_predict)):
-#         if test_predict[i] == True:
-#             combine_test[i] += 1 * clf_factor
-#     # print(test_predict)
-#     score_train = clf.score(X_train, y_train)
-#     score_test = clf.score(X_test, y_test)
-#     print('Accuracy of ' + name + ' on training set: ' + str(score_train))
-#     print('Accuracy of ' + name + ' on test set: ' + str(score_test))
-#
-# train_predict = []
-# test_predict = []
-# for i in range(len(combine_train)):
-#     if combine_train[i] >= 8:
-#         train_predict.append(True)
-#     else:
-#         train_predict.append(False)
-#
-#     if combine_test[i] >= 8:
-#         test_predict.append(True)
-#     else:
-#         test_predict.append(False)
-#
-# score_train = accuracy_score(train_predict, y_train)
-# score_test = accuracy_score(test_predict, y_test)
-#
-# print('Accuracy of Combined on training set: ' + str(score_train))
-# print('Accuracy of Combined on test set: ' + str(score_test))
-
-#
-#
-# def lookForContra(data, test):
-#     hashmap={}
-#     for features_list in data:
-#         key = features_list[0]
-#         hashmap[key] = 0
-#
-#     for features_list in test:
-#         key = features_list[0]
-#         hashmap[key] = 0
-#
-#     for features_list in data:
-#         key = features_list[0]
-#         hashmap[key] += 1
-#
-#     for features_list in test:
-#         key = features_list[0]
-#         hashmap[key] += 1
-#
-#     for key in hashmap:
-#         if hashmap[key] > 1:
-#             print(key)
-
-
-def convertFeaturesToResFet(X_train ,y_train, features):
+def convertFeaturesToResFet(X_train, y_train, features):
     clf_results = []
     for name, clf in zip(names, classifiers):
         # clf_factor = factor[name]
@@ -163,9 +103,9 @@ def convertFeaturesToResFet(X_train ,y_train, features):
     return clf_results
 
 
-def newClassifier(X_train ,y_train, X_test, y_test):
-    clf_results_train = convertFeaturesToResFet(X_train ,y_train, X_train)
-    clf_results_test = convertFeaturesToResFet(X_train ,y_train, X_test)
+def newClassifier(X_train, y_train, X_test, y_test):
+    clf_results_train = convertFeaturesToResFet(X_train, y_train, X_train)
+    clf_results_test = convertFeaturesToResFet(X_train, y_train, X_test)
 
     new_train = []
     for features, extra in zip(X_train, clf_results_train):
@@ -204,31 +144,34 @@ def newClassifier(X_train ,y_train, X_test, y_test):
 # print('Avg accuracy of ' + "MAXX" + ' on training set: ' + str(train_avg/50))
 # print('Avg accuracy of ' + "MAXX" + ' on test set: ' + str(test_avg/50))
 
-
-
-neigh = KNeighborsClassifier(n_neighbors=1)
-neigh.fit(X_train, y_train)
-score = neigh.score(X_test, y_test)
-# print(score)
-
-features_chosen = sfs(X_train, y_train, 10, neigh, utilityFunction)
-
-# create x_train_subset and x_test_subset containing only values of chosen features
-X_train_subset = [[] for i in range(len(X_train))]
-X_test_subset = [[] for i in range(len(X_test))]
-for feature_index in features_chosen:
-    for object_index in range(len(X_test)):
-        X_test_subset[object_index].append(X_test[object_index][feature_index])
-    for object_index in range(len(X_train)):
-        X_train_subset[object_index].append(X_train[object_index][feature_index])
+# TODO: feature selection
+# neigh = KNeighborsClassifier(n_neighbors=3)
+# neigh.fit(X_train, y_train)
+# score = neigh.score(X_test, y_test)
+# features_chosen = sfs(X_train, y_train, 10, neigh, utilityFunction)
+# # create x_train_subset and x_test_subset containing only values of chosen features
+# X_train_subset = [[] for i in range(len(X_train))]
+# X_test_subset = [[] for i in range(len(X_test))]
+# for feature_index in features_chosen:
+#     for object_index in range(len(X_test)):
+#         X_test_subset[object_index].append(X_test[object_index][feature_index])
+#     for object_index in range(len(X_train)):
+#         X_train_subset[object_index].append(X_train[object_index][feature_index])
+path = "updated_features.data"
+# with open(path, 'wb') as f:
+#     tuple_to_store = X_train_subset, X_test_subset
+#     pickle.dump(tuple_to_store, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 # x_train_subset and x_test_subset are updated with relevant features only
 
 # newClassifier(X_train_subset, y_train, X_test_subset, y_test)
 
+with open(path, 'rb') as f:
+    X_train_subset, X_test_subset = pickle.load(f)
+
 test_avg = 0
 train_avg = 0
-iterations =50
+iterations = 50
 for i in range(iterations):
     print(i)
     score_train, score_test = newClassifier(X_train_subset, y_train, X_test_subset, y_test)
@@ -236,6 +179,5 @@ for i in range(iterations):
     test_avg += score_test
     print('current accuracy of ' + "MAXX" + ' on test set: ' + str(score_test))
 
-print('Avg accuracy of ' + "MAXX" + ' on training set: ' + str(train_avg/iterations))
-print('Avg accuracy of ' + "MAXX" + ' on test set: ' + str(test_avg/iterations))
-
+print('Avg accuracy of ' + "MAXX" + ' on training set: ' + str(train_avg / iterations))
+print('Avg accuracy of ' + "MAXX" + ' on test set: ' + str(test_avg / iterations))

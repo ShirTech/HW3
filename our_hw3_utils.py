@@ -35,7 +35,6 @@ def sfs(x, y, required_features_num, clf, score):
     return features_chosen
 
 
-
 def sbs(x, y, k, clf, score):
     """
     :param x: feature set to be trained using clf. list of lists.
@@ -67,7 +66,7 @@ def sbs(x, y, k, clf, score):
             # create x_subset_temp containing values for all chosen features and the new feature the we are considering
             x_subset_temp = copy.deepcopy(x_subset)
             for object_index in range(len(x)):
-                x_subset_temp[object_index][feature_index]=0
+                x_subset_temp[object_index][feature_index] = 0
 
             temp_score = score(clf, x_subset_temp, y)
             if temp_score < min_score:
@@ -87,8 +86,6 @@ def utilityFunction(clf, x, y):
     # to be used as score function in sfs algorithm
     scores = cross_val_score(clf, x, y, cv=4)
     return scores.mean()
-
-
 
 #
 # features_for_removal = sbs(X_train, y_train, 4, neigh, utilityFunction)
