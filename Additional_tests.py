@@ -67,7 +67,7 @@ def Additional_tests():
     avg_accuracy, avg_error = evaluate(perceptron, 2)
     results.append([2, avg_accuracy, avg_error])
 
-    with open("experiments/experiments12.csv", "w") as csv_file:
+    with open("experiments12.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
         for row in results:
             writer.writerow(row)

@@ -10,7 +10,7 @@ def KNN_test():
         results.append([k, avg_accuracy, avg_error])
 
 
-    with open("experiments/experiments6.csv", "w") as csv_file:
+    with open("experiments6.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
         for row in results:
             writer.writerow(row)

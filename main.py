@@ -12,9 +12,9 @@ def main():
     x = (train_features, train_labels)
     # split_crosscheck_groups(x, 2)
 
-    KNN_test()
-    Additional_tests()
-    # compete()
+    # KNN_test()
+    # Additional_tests()
+    compete()
 
 
 main()
