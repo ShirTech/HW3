@@ -28,7 +28,7 @@ class id3_factory(abstract_classifier_factory):
     :return: id3 classifier object
     '''
     def train(self, data, labels):
-        clf = DecisionTreeClassifier(criterion="entropy", random_state=0).fit(data, labels)
+        clf = DecisionTreeClassifier(criterion="entropy").fit(data, labels)
         return id3_classifier(clf)
 
 
@@ -53,7 +53,7 @@ class perceptron_factory(abstract_classifier_factory):
     :return: id3 classifier object
     '''
     def train(self, data, labels):
-        return perceptron_classifier(Perceptron(max_iter=5, tol=None, random_state=0).fit(data, labels))
+        return perceptron_classifier(Perceptron(max_iter=5, tol=None).fit(data, labels))
 
 
 def Additional_tests():
