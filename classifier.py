@@ -5,8 +5,6 @@ from collections import Counter
 
 from hw3_utils import abstract_classifier, load_data, abstract_classifier_factory
 
-train_features, train_labels, test_features = load_data()
-
 
 def majority(arr):
     classification_dictionary = Counter(arr)
@@ -183,6 +181,3 @@ def getFeatures(train_group):
 def getLabels(train_group):
     return train_group[1]
 
-
-# x = (train_features, train_labels)
-# split_crosscheck_groups(x, 2)

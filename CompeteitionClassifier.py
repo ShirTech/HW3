@@ -45,21 +45,23 @@ def convertFeaturesToResultFeatures(X_train, y_train, features):
 def competition_test(X_train_subset, train_labels, X_test_subset):
 
     # TODO: testing our classifier
-    total_avg = 0
-    for k in [2, 4, 6, 8, 10]:
-        test_size = 1 / k
-        total_score_per_k_train = 0
-        total_score_per_k_test = 0
-        for i in range(k):
-            X_train, X_test, y_train, y_test = train_test_split(X_train_subset, train_labels, test_size=test_size,
-                                                                random_state=i)
-            clf = CompetitionClassifier(X_train, y_train)
-            total_score_per_k_train += clf.test(X_train, y_train)
-            total_score_per_k_test += clf.test(X_test, y_test)
-        print('K value is: ' + str(k))
-        print('Avg accuracy of CompetitionClassifier on test set: ' + str(total_score_per_k_test / k))
-        total_avg += total_score_per_k_test / k
-    print('Total avg for all k is: ' + str(total_avg / 5))
+    # this part is commented-out for the submittion in case the staff will want to run this part
+    # these are our inner tests
+    # total_avg = 0
+    # for k in [2, 4, 6, 8, 10]:
+    #     test_size = 1 / k
+    #     total_score_per_k_train = 0
+    #     total_score_per_k_test = 0
+    #     for i in range(k):
+    #         X_train, X_test, y_train, y_test = train_test_split(X_train_subset, train_labels, test_size=test_size,
+    #                                                             random_state=i)
+    #         clf = CompetitionClassifier(X_train, y_train)
+    #         total_score_per_k_train += clf.test(X_train, y_train)
+    #         total_score_per_k_test += clf.test(X_test, y_test)
+    #     print('K value is: ' + str(k))
+    #     print('Avg accuracy of CompetitionClassifier on test set: ' + str(total_score_per_k_test / k))
+    #     total_avg += total_score_per_k_test / k
+    # print('Total avg for all k is: ' + str(total_avg / 5))
 
     # TODO: classify for contest
     clf = CompetitionClassifier(X_train_subset, train_labels)
@@ -134,5 +136,3 @@ def compete():
 
     competition_test(X_train_subset, train_labels, X_test_subset)
 
-
-compete()

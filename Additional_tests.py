@@ -28,7 +28,7 @@ class id3_factory(abstract_classifier_factory):
     :return: id3 classifier object
     '''
     def train(self, data, labels):
-        clf = DecisionTreeClassifier(criterion="entropy").fit(data, labels)
+        clf = DecisionTreeClassifier(criterion="entropy", random_state=0).fit(data, labels)
         return id3_classifier(clf)
 
 
@@ -53,21 +53,21 @@ class perceptron_factory(abstract_classifier_factory):
     :return: id3 classifier object
     '''
     def train(self, data, labels):
-        return perceptron_classifier(Perceptron(max_iter=5, tol=None).fit(data, labels))
+        return perceptron_classifier(Perceptron(max_iter=5, tol=None, random_state=0).fit(data, labels))
 
 
-results = []
+def Additional_tests():
+    results = []
 
-id3 = id3_factory()
-avg_accuracy, avg_error = evaluate(id3, 2)
-results.append([1, avg_accuracy, avg_error])
+    id3 = id3_factory()
+    avg_accuracy, avg_error = evaluate(id3, 2)
+    results.append([1, avg_accuracy, avg_error])
 
+    perceptron = perceptron_factory()
+    avg_accuracy, avg_error = evaluate(perceptron, 2)
+    results.append([2, avg_accuracy, avg_error])
 
-perceptron = perceptron_factory()
-avg_accuracy, avg_error = evaluate(perceptron, 2)
-results.append([2, avg_accuracy, avg_error])
-
-with open("experiments/experiments12.csv", "w") as csv_file:
-    writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
-    for row in results:
-        writer.writerow(row)
+    with open("experiments/experiments12.csv", "w") as csv_file:
+        writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
+        for row in results:
+            writer.writerow(row)
